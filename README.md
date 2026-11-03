@@ -75,6 +75,22 @@ Edit `macos/init.lua`, then reload with 🔨 menu bar icon → **Reload Config**
 - **Anything else** (another modifier, app launching, window moves, …): add a handler that checks
   the condition, does the action, and returns `true` to swallow the original event.
 
+## Known limitations
+
+- **⌥+click and ⌥+scroll stop working everywhere.** That includes ⌥-drag to copy in Finder, ⌥-click
+  to move the cursor in iTerm2, and ⌥+scroll zoom in design apps.
+- **Secure input blocks it.** In password fields, or with iTerm2's *Secure Keyboard Entry* on, macOS
+  hides key events from Hammerspoon. The side-button remaps don't fire there, and an ⌥ release can
+  be missed until you press ⌥ again.
+- **The mapping follows KensingtonWorks.** If you change what a side button sends in KensingtonWorks,
+  or use per-app profiles that send different shortcuts, update `KW_BUTTONS`.
+- **Media keys go to the "Now Playing" app**, which macOS picks. That may be a browser tab rather than Spotify.
+- **Fast spins drop volume steps** because of the `SCROLL_GAP` throttle. Lower it if that bothers you.
+- **This file is your whole Hammerspoon config.** To use other Hammerspoon scripts, keep your own
+  `init.lua` and `dofile()` this one from it.
+- **Updates can revoke Accessibility.** After a Hammerspoon or macOS update, re-check System Settings
+  → Privacy & Security → Accessibility if it stops working.
+
 ## Other OSes (not done)
 
 - Windows: AutoHotkey, e.g. `!WheelUp::Send {Volume_Up}`.
