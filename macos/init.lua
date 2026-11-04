@@ -1,5 +1,5 @@
 -- kensington-orbit-remapper: "media mode" for the Kensington Orbit Fusion while ⌥ Option is held.
--- Normal mode = whatever KensingtonWorks does. This file only changes behavior while ⌥ is held.
+-- Normal mode = whatever Kensington Konnect does. This file only changes behavior while ⌥ is held.
 -- Install: symlink this file to ~/.hammerspoon/init.lua (see README.md)
 
 require("hs.ipc") -- enables the `hs` CLI (hs -c "hs.reload()")
@@ -14,12 +14,12 @@ local SCROLL_GAP = 0.05      -- seconds between volume steps (throttles the ring
 local LOG_EVENTS = false     -- true: log mouse/shortcut events (to map new buttons)
 local LOG_FILE = hs.configdir .. "/orbit-remapper-events.log" -- ~/.hammerspoon/
 
--- Keystrokes KensingtonWorks sends for its buttons → media key while ⌥ is held.
--- To map another KW button: set LOG_EVENTS=true, press it, and add its keycode + flags here.
+-- Keystrokes Konnect sends for its buttons → media key while ⌥ is held.
+-- To map another Konnect button: set LOG_EVENTS=true, press it, and add its keycode + flags here.
 -- `needs`: every entry must be present; a nested list means "any of these".
 -- ⌘ and ⌃ are interchangeable because apps like iTerm2 can swap them (Keys → Remap Modifiers).
 local CMD_OR_CTRL = { "cmd", "ctrl" }
-local KW_BUTTONS = {
+local KONNECT_BUTTONS = {
   { name = "Shottr",          keycode = 19,  needs = { CMD_OR_CTRL, "shift" }, media = "PLAY" },     -- ⌘⇧2
   { name = "Mission Control", keycode = 126, needs = { CMD_OR_CTRL },          media = "PREVIOUS" }, -- ⌃↑
 }
@@ -36,7 +36,7 @@ local function mediaKey(key)
   end
 end
 
--- KensingtonWorks strips ⌥ from the keystrokes it sends, so track the physical ⌥ key ourselves.
+-- Konnect strips ⌥ from the keystrokes it sends, so track the physical ⌥ key ourselves.
 local ALT_KEYS = { [58] = true, [61] = true } -- left / right Option
 local altHeld = false
 
@@ -88,8 +88,8 @@ local function onLeftMouse(e)
 end
 
 ---------------------------------------------------------------------------
--- ⌥ + KensingtonWorks shortcut buttons
--- A KW keystroke = physical ⌥ held, but the event itself has no ⌥ (KW replaced the flags).
+-- ⌥ + Konnect shortcut buttons
+-- A Konnect keystroke = physical ⌥ held, but the event itself has no ⌥ (Konnect replaced the flags).
 -- A real ⌥⌘⇧2 typed on the keyboard keeps its ⌥ flag and passes through untouched.
 ---------------------------------------------------------------------------
 local swallowKeyUp = {}
@@ -104,7 +104,7 @@ local function onKey(e)
     return false
   end
   if not altHeld or flags.alt then return false end
-  for _, b in ipairs(KW_BUTTONS) do
+  for _, b in ipairs(KONNECT_BUTTONS) do
     if code == b.keycode and hasAll(flags, b.needs) then
       swallowKeyUp[code] = true
       mediaKey(b.media)

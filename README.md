@@ -3,28 +3,29 @@
 Adds a **media mode** to the Kensington Orbit Fusion Wireless trackball on macOS. Hold **⌥ Option**
 and the scroll ring and buttons control music and volume. Release it and everything works as before.
 
-It runs on top of [KensingtonWorks](https://www.kensington.com/software/kensingtonworks/) using
-[Hammerspoon](https://www.hammerspoon.org/). Your normal button setup in KensingtonWorks stays untouched.
+It runs on top of **Kensington Konnect** (the app formerly called KensingtonWorks) using
+[Hammerspoon](https://www.hammerspoon.org/). Your normal button setup in Konnect stays untouched.
 
-| Control | Normal (KensingtonWorks) | ⌥ held (media mode) |
+| Control | Normal (Konnect) | ⌥ held (media mode) |
 |---|---|---|
 | Scroll ring | scroll | volume (down = louder; see `INVERT_SCROLL`) |
 | Top side button | screenshot shortcut (⌘⇧2) | play / pause |
 | Left side button | Mission Control (⌃↑) | previous track |
 | Any left-click button | left click | next track |
 
-The side-button rows match my KensingtonWorks setup. If yours sends different shortcuts, edit
-`KW_BUTTONS` in `macos/init.lua` (see "Adding a button" below).
+The side buttons only work in media mode if Konnect sends the matching shortcut for them (see
+"Set up Konnect" below). If yours sends different shortcuts, edit `KONNECT_BUTTONS` in `macos/init.lua`
+(see "Adding a button" below).
 
 ## How it works
 
 ```
- trackball ──► KensingtonWorks ──► Hammerspoon event taps ──► apps
+ trackball ──► Konnect ──────────► Hammerspoon event taps ──► apps
                (normal mode)       ⌥ held → swallow the event,
                                    send a media key instead
 ```
 
-1. **KensingtonWorks** turns physical buttons into events. Some become clicks; side buttons can
+1. **Konnect** turns physical buttons into events. Some become clicks; side buttons can
    become **fake keystrokes**, e.g. Mission Control = ⌃↑.
 2. **Hammerspoon** installs *event taps*: hooks that see every input event before apps do, and
    can let it through, change it, or swallow it. Hammerspoon needs Accessibility permission for this.
@@ -36,13 +37,13 @@ The side-button rows match my KensingtonWorks setup. If yours sends different sh
    they control whatever is playing (Spotify, Music, a browser tab, …).
 
 Gotchas this code handles:
-- **KensingtonWorks strips ⌥** from the keystrokes it fakes, so the code tracks the physical ⌥ key
-  itself. A keystroke that arrives while ⌥ is held but has no ⌥ flag came from KensingtonWorks.
+- **Konnect strips ⌥** from the keystrokes it fakes, so the code tracks the physical ⌥ key
+  itself. A keystroke that arrives while ⌥ is held but has no ⌥ flag came from Konnect.
   A real ⌥⌘⇧2 typed on the keyboard keeps its ⌥ flag and passes through.
 - **Apps can remap modifiers.** iTerm2's "Remap Modifiers" swaps ⌘/⌃ even for fake keystrokes,
   so ⌘ and ⌃ are treated as interchangeable when matching side buttons.
 - **⌥ is removed from the media keys sent.** Otherwise ⌥+🔊 opens Sound settings.
-- Hammerspoon sees what KensingtonWorks *sends*, not physical buttons. Buttons set to the same
+- Hammerspoon sees what Konnect *sends*, not physical buttons. Buttons set to the same
   action (e.g. two "Left Click" buttons) behave the same in media mode.
 - Trade-off: ⌥+click and ⌥+scroll are taken over everywhere (e.g. ⌥-drag to copy in Finder).
 
@@ -59,6 +60,19 @@ turn on "Launch at login".
 
 If you already have a `~/.hammerspoon/init.lua`, add `dofile("/path/to/macos/init.lua")` to it instead.
 
+### Set up Konnect
+
+Scroll and click work with Konnect's defaults. The side buttons need a keyboard shortcut assigned
+in Konnect, because media mode reacts to that shortcut, not to the button itself:
+
+| Button | Assign in Konnect | Media mode action |
+|---|---|---|
+| Top side button | keystroke ⌘⇧2 | play / pause |
+| Left side button | keystroke ⌃↑ (or the Mission Control action, which sends ⌃↑) | previous track |
+
+If a side button does nothing in media mode, check that Konnect has its shortcut set. Without it,
+Hammerspoon never sees a keystroke to turn into a media key.
+
 ## Changing things
 
 Edit `macos/init.lua`, then reload with 🔨 menu bar icon → **Reload Config**, or
@@ -69,9 +83,9 @@ Edit `macos/init.lua`, then reload with 🔨 menu bar icon → **Reload Config**
 - **Volume speed:** `SCROLL_GAP` sets the seconds between steps. Lower is faster.
 - **Swap actions:** change the `media = "…"` values or `CLICK_MEDIA`. Available keys include
   `SOUND_UP/DOWN`, `MUTE`, `PLAY`, `NEXT`, `PREVIOUS`, `FAST`, `REWIND`, `BRIGHTNESS_UP/DOWN`.
-- **Adding a button** (a KensingtonWorks shortcut): set `LOG_EVENTS = true`, reload, and press
+- **Adding a button** (a Konnect shortcut): set `LOG_EVENTS = true`, reload, and press
   the button. Open `~/.hammerspoon/orbit-remapper-events.log`, note its keycode and flags, and add
-  a line to `KW_BUTTONS`. Set `LOG_EVENTS` back to `false`. The logger never records plain typing.
+  a line to `KONNECT_BUTTONS`. Set `LOG_EVENTS` back to `false`. The logger never records plain typing.
 - **Anything else** (another modifier, app launching, window moves, …): add a handler that checks
   the condition, does the action, and returns `true` to swallow the original event.
 
@@ -82,8 +96,8 @@ Edit `macos/init.lua`, then reload with 🔨 menu bar icon → **Reload Config**
 - **Secure input blocks it.** In password fields, or with iTerm2's *Secure Keyboard Entry* on, macOS
   hides key events from Hammerspoon. The side-button remaps don't fire there, and an ⌥ release can
   be missed until you press ⌥ again.
-- **The mapping follows KensingtonWorks.** If you change what a side button sends in KensingtonWorks,
-  or use per-app profiles that send different shortcuts, update `KW_BUTTONS`.
+- **The mapping follows Konnect.** If you change what a side button sends in Konnect,
+  or use per-app profiles that send different shortcuts, update `KONNECT_BUTTONS`.
 - **Media keys go to the "Now Playing" app**, which macOS picks. That may be a browser tab rather than Spotify.
 - **Fast spins drop volume steps** because of the `SCROLL_GAP` throttle. Lower it if that bothers you.
 - **This file is your whole Hammerspoon config.** To use other Hammerspoon scripts, keep your own
