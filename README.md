@@ -1,6 +1,6 @@
 # kensington-orbit-remapper
 
-Adds a **media mode** to the Kensington Orbit Fusion Wireless trackball on macOS. Hold **⌥ Option**
+Adds a **media mode** to the Kensington Orbit Fusion Wireless trackball on macOS and Windows. Hold **⌥ Option** (Alt on Windows)
 and the scroll ring and buttons control music and volume. Release it and everything works as before.
 
 It runs on top of **Kensington Konnect** (the app formerly called KensingtonWorks) using
@@ -122,10 +122,44 @@ Edit `macos/init.lua`, then reload with 🔨 menu bar icon → **Reload Config**
 - **Updates can revoke Accessibility.** After a Hammerspoon or macOS update, re-check System Settings
   → Privacy & Security → Accessibility if it stops working.
 
-## Other OSes (not done)
+## Windows
 
-- Windows: AutoHotkey, e.g. `!WheelUp::Send {Volume_Up}`.
-- Linux: `input-remapper` (works on X11 and Wayland).
+`windows/orbit-remapper.ahk` does the same with [AutoHotkey v2](https://www.autohotkey.com/), on
+top of Konnect for Windows. Hold **Alt** instead of ⌥. The middle-button mode works the same way.
+
+| Control | Alt held | Middle button held |
+|---|---|---|
+| Scroll ring | volume | volume |
+| Top side button | play / pause | |
+| Left side button | previous track | |
+| Any left-click button | next track | |
+| Right click | | play / pause |
+| Roll left / right | | previous / next virtual desktop (Ctrl+Win+←/→) |
+| Roll up / down | | next / previous track |
+
+### Install (Windows)
+
+1. Install AutoHotkey v2 (`winget install AutoHotkey.AutoHotkey`) and clone this repo.
+2. In Konnect, set the **left side button to Button 4 (Back)** and the **top side button to
+   Button 5 (Forward)**, and a spare button to **Middle Click**. On Windows the script matches
+   these mouse buttons (`ALT_BUTTONS`), so no keyboard shortcuts are needed.
+3. Double-click `orbit-remapper.ahk`. A tray notification confirms it loaded.
+4. To start it at login, press Win+R, type `shell:startup`, and put a shortcut to the script there.
+
+To edit it, change the settings at the top of the file, then tray icon → **Reload Script**. To
+find what a button sends, use tray icon → **Key history (identify buttons)**, press the button,
+and refresh with F5.
+
+Differences from macOS:
+- The pointer stays pinned in place while the middle button is held. On macOS it moves and
+  jumps back when you release.
+- Windows keeps no per-event modifier flags, so the side buttons don't need the "⌥ is missing"
+  trick. They are plain Alt+XButton hotkeys.
+- Programs running as administrator ignore the script unless it also runs as administrator.
+
+## Linux (not done)
+
+`input-remapper` would work (on X11 and Wayland).
 
 ## License
 
