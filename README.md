@@ -13,6 +13,16 @@ It runs on top of **Kensington Konnect** (the app formerly called KensingtonWork
 | Left side button | Mission Control (⌃↑) | previous track |
 | Any left-click button | left click | next track |
 
+Mouse only: **hold the middle-click button** and
+
+| Then | Action |
+|---|---|
+| Roll left / right | previous / next desktop (sends the "Move left/right a space" shortcut) |
+| Roll up / down | next / previous track |
+| Right click | play / pause |
+| Scroll ring | volume |
+| Nothing (press and release) | normal middle click |
+
 The side buttons only work in media mode if Konnect sends the matching shortcut for them (see
 "Set up Konnect" below). If yours sends different shortcuts, edit `KONNECT_BUTTONS` in `macos/init.lua`
 (see "Adding a button" below).
@@ -69,6 +79,11 @@ in Konnect, because media mode reacts to that shortcut, not to the button itself
 |---|---|---|
 | Top side button | keystroke ⌘⇧2 | play / pause |
 | Left side button | keystroke ⌃↑ (or the Mission Control action, which sends ⌃↑) | previous track |
+| Big button that defaults to left click (or any spare one) | Middle Click | hold = mouse-only mode (desktops, tracks, play/pause, volume) |
+
+Desktop switching sends macOS's "Move left/right a space" shortcuts, so keep them on (System
+Settings → Keyboard → Keyboard Shortcuts → Mission Control). Set `DESKTOP_MODS` to the modifier used there (macOS default ⌃; ⌘ if you changed it). Tune `SWIPE_PX` (roll distance per
+switch) and `SWIPE_GAP` in `macos/init.lua`.
 
 If a side button does nothing in media mode, check that Konnect has its shortcut set. Without it,
 Hammerspoon never sees a keystroke to turn into a media key.
@@ -99,6 +114,8 @@ Edit `macos/init.lua`, then reload with 🔨 menu bar icon → **Reload Config**
 - **The mapping follows Konnect.** If you change what a side button sends in Konnect,
   or use per-app profiles that send different shortcuts, update `KONNECT_BUTTONS`.
 - **Media keys go to the "Now Playing" app**, which macOS picks. That may be a browser tab rather than Spotify.
+- **Middle-drag is taken over** (e.g. panning in 3D/design apps), and a plain middle click fires on
+  release instead of on press.
 - **Fast spins drop volume steps** because of the `SCROLL_GAP` throttle. Lower it if that bothers you.
 - **This file is your whole Hammerspoon config.** To use other Hammerspoon scripts, keep your own
   `init.lua` and `dofile()` this one from it.
