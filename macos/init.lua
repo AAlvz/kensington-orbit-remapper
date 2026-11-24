@@ -245,13 +245,14 @@ end
 
 -- macOS disables slow event taps; re-enable if that happens and forget any held state.
 -- Also drop a mode whose button is no longer physically down.
+-- Not for middle mode: macOS never reports Konnect's middle click as held, so this would end it
+-- within 2 s. A missed middle release is fixed by the next middle press.
 tapWatchdog = hs.timer.doEvery(2, function()
   if not mouseTap:isEnabled() or not keyTap:isEnabled() then
     mouseTap:start(); keyTap:start(); resetModes()
     return
   end
   local b = hs.mouse.getButtons()
-  if swipe and not (b.middle or b[3]) then swipe = nil end
   if clickAsMedia and not (b.left or b[1]) then clickAsMedia = false end
   if rightAsMedia and not (b.right or b[2]) then rightAsMedia = false end
 end)
