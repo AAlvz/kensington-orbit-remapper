@@ -20,6 +20,8 @@ Mouse only: **hold the middle-click button** and
 | Roll left / right | previous / next desktop (sends the "Move left/right a space" shortcut) |
 | Roll up / down | next / previous track |
 | Right click | play / pause |
+| Top side button | back (⌘[) |
+| Left side button | forward (⌘]) |
 | Scroll ring | volume |
 | Nothing (press and release) | normal middle click |
 
@@ -79,7 +81,7 @@ in Konnect, because media mode reacts to that shortcut, not to the button itself
 |---|---|---|
 | Top side button | keystroke ⌘⇧2 | play / pause |
 | Left side button | keystroke ⌃↑ (or the Mission Control action, which sends ⌃↑) | previous track |
-| Big button that defaults to left click (or any spare one) | Middle Click | hold = mouse-only mode (desktops, tracks, play/pause, volume) |
+| Big button that defaults to left click (or any spare one) | Middle Click | hold = mouse-only mode (desktops, tracks, play/pause, back/forward, volume) |
 
 Desktop switching sends macOS's "Move left/right a space" shortcuts, so keep them on (System
 Settings → Keyboard → Keyboard Shortcuts → Mission Control). Set `DESKTOP_MODS` to the modifier used there (macOS default ⌃; ⌘ if you changed it). Tune `SWIPE_PX` (roll distance per

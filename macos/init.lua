@@ -17,16 +17,18 @@ local LOG_FILE = hs.configdir .. "/orbit-remapper-events.log" -- ~/.hammerspoon/
 -- Keystrokes Konnect sends for its buttons → media key while ⌥ is held.
 -- To map another Konnect button: set LOG_EVENTS=true, press it, and add its keycode + flags here.
 -- `needs`: every entry must be present; a nested list means "any of these".
+-- `middle`: what the button does while the middle button is held (BACK / FORWARD, see NAV_KEYS).
 -- ⌘ and ⌃ are interchangeable because apps like iTerm2 can swap them (Keys → Remap Modifiers).
 local CMD_OR_CTRL = { "cmd", "ctrl" }
 local KONNECT_BUTTONS = {
-  { name = "Shottr",          keycode = 19,  needs = { CMD_OR_CTRL, "shift" }, media = "PLAY" },     -- ⌘⇧2
-  { name = "Mission Control", keycode = 126, needs = { CMD_OR_CTRL },          media = "PREVIOUS" }, -- ⌃↑
+  { name = "Shottr",          keycode = 19,  needs = { CMD_OR_CTRL, "shift" }, media = "PLAY",     middle = "BACK" },    -- ⌘⇧2
+  { name = "Mission Control", keycode = 126, needs = { CMD_OR_CTRL },          media = "PREVIOUS", middle = "FORWARD" }, -- ⌃↑
 }
 local CLICK_MEDIA = "NEXT"   -- ⌥ + left click (any left-click button)
 
 -- Middle button held = mouse-only modifier: roll left/right = previous/next desktop,
--- roll up/down = next/previous track, right click = play/pause, scroll ring = volume.
+-- roll up/down = next/previous track, right click = play/pause, scroll ring = volume,
+-- top / left side button = back / forward (the `middle` field of KONNECT_BUTTONS).
 -- A press without any of these stays a middle click. Sends macOS's "Move left/right a space" shortcut (System Settings →
 -- Keyboard → Keyboard Shortcuts → Mission Control); DESKTOP_MODS must match what is set there.
 local DESKTOP_MODS = { "cmd" } -- ⌘← / ⌘→ here; the macOS default is { "ctrl" }
@@ -36,6 +38,7 @@ local SWIPE_GAP = 0.35       -- seconds between actions (lets the desktop slide 
 local ROLL_UP_MEDIA, ROLL_DOWN_MEDIA = "NEXT", "PREVIOUS"
 local MIDDLE_RIGHT_CLICK_MEDIA = "PLAY"
 local CLICK_SLOP_PX = 6      -- total movement under this still counts as a plain click
+local NAV_KEYS = { BACK = "[", FORWARD = "]" } -- ⌘[ / ⌘] = back / forward in Chrome, Safari, Finder
 
 ---------------------------------------------------------------------------
 -- Helpers
@@ -119,11 +122,17 @@ local function onKey(e)
     if swallowKeyUp[code] then swallowKeyUp[code] = nil; return true end
     return false
   end
-  if not altHeld or flags.alt then return false end
+  if flags.alt or not (altHeld or swipe) then return false end
   for _, b in ipairs(KONNECT_BUTTONS) do
     if code == b.keycode and hasAll(flags, b.needs) then
+      if swipe then -- middle button held: back / forward
+        if not b.middle then return false end
+        swipe.used = true
+        hs.eventtap.keyStroke({ "cmd" }, NAV_KEYS[b.middle], 0)
+      else
+        mediaKey(b.media)
+      end
       swallowKeyUp[code] = true
-      mediaKey(b.media)
       return true
     end
   end
